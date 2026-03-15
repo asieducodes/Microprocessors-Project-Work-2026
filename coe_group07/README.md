@@ -262,7 +262,7 @@ Calculation:
 
 **Group 7 | COE 381 — Microprocessors | KNUST**
 **Department of Computer Engineering**
-**Supervisor: Dr. Elliel Keelson**
+**Supervisor: Dr. Eliel Keelson**
 **© 2026 — All work is original. Plagiarism policy strictly observed.**
 
 </div>
