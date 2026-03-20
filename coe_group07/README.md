@@ -238,7 +238,7 @@ Calculation:
 
 - [x] Source code uploaded to `code/` folder
 - [ ] Wokwi simulation link added to `simulation/wokwi_link.txt`
-- [ ] Circuit screenshot saved to `simulation/circuit_screenshot.png`
+- [ ] Circuit screenshot saved to `simulation/general_setup.png`
 - [x] Academic report uploaded to `report/` folder
 - [ ] Presentation slides uploaded to `presentation/` folder
 - [ ] Video presentation uploaded to `presentation/` folder
