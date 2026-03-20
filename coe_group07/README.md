@@ -1,12 +1,27 @@
-# 🎯 High-Precision Dual-Player Reaction Time Measurement System
+# High-Precision Dual-Player Reaction Time Measurement System
 
-> **COE 381 — Microprocessors | Group 7 | Department of Computer Engineering | KNUST**
+<div align="center">
+
+![Project Banner](https://capsule-render.vercel.app/api?type=waving&color=0D1B2A&height=200&section=header&text=Reaction%20Time%20System&fontSize=40&fontColor=00B4D8&animation=fadeIn&fontAlignY=38&desc=Group%207%20%7C%20COE%20381%20%7C%20KNUST&descAlignY=58&descColor=F4A900)
+
+</div>
+
+<div align="center">
+
+![Course](https://img.shields.io/badge/Course-COE%20381%20Microprocessors-0D1B2A?style=for-the-badge&labelColor=1B3A5C)
+![Group](https://img.shields.io/badge/Group-7-F4A900?style=for-the-badge&labelColor=0D1B2A)
+![Platform](https://img.shields.io/badge/Platform-ESP32%20%2B%20Wokwi-00B4D8?style=for-the-badge&logo=espressif&logoColor=white&labelColor=0D1B2A)
+![Language](https://img.shields.io/badge/Language-Arduino%20C%2B%2B-2E6DA4?style=for-the-badge&logo=arduino&logoColor=white&labelColor=0D1B2A)
+![Status](https://img.shields.io/badge/Status-Simulation%20Complete-2DC653?style=for-the-badge&labelColor=0D1B2A)
+![Deadline](https://img.shields.io/badge/Deadline-March%2029%2C%202026-E63946?style=for-the-badge&labelColor=0D1B2A)
+
+</div>
 
 ---
 
-## 📋 Project Information
+## Project Information
 
-| Field | Details |
+| | |
 |---|---|
 | **Project Title** | High-Precision Dual-Player Reaction Time Measurement System |
 | **Course** | Microprocessors |
@@ -19,10 +34,10 @@
 
 ---
 
-## 👥 Group Members
+## Group Members
 
-| # | Full Name | Index Number |
-|---|---|---|
+| No. | Full Name | Index Number |
+|:---:|---|:---:|
 | 1 | Asiedu Seth Osei | 7265823 |
 | 2 | Frimpong Roddy | 7271123 |
 | 3 | Jessica Oforiwaa Anim | 7263623 |
@@ -35,220 +50,219 @@
 
 ---
 
-## 📌 Project Summary
+## Project Summary
 
-This project designs and implements a competitive **dual-player reaction time measurement system** using the **ESP32 microcontroller**, simulated on the **Wokwi** online embedded systems platform.
+This project designs and implements a competitive dual-player reaction time measurement system using the **ESP32 microcontroller**, simulated on the **Wokwi** online embedded systems platform.
 
-A randomised stimulus LED activates after a variable delay of 2–5 seconds. Both players respond simultaneously by pressing their dedicated push buttons. The system:
-
-- Measures each player's reaction time in **milliseconds** using interrupt-driven GPIO detection
-- Determines and declares the **winner** based on comparative timestamp analysis
-- Detects and penalises **false starts** before the stimulus activates
-- Displays all results on a **16x2 I2C LCD display**
-- Provides distinct **audio feedback** through a passive buzzer for every game event
-- Maintains a **running score tally** across multiple rounds
+A randomised stimulus LED activates after a variable delay of 2 to 5 seconds. Both players respond simultaneously by pressing their dedicated push buttons. The system measures each player's response time in milliseconds using interrupt-driven GPIO detection, determines the winner through comparative timestamp analysis, detects and penalises false starts, and displays all results on a 16x2 I2C LCD display. A passive buzzer provides distinct audio feedback for every game event, and a running score tally is maintained across multiple rounds.
 
 ---
 
-## 🛠️ Hardware Components
+## Hardware Components
 
 | Component | Specification | Role |
 |---|---|---|
 | ESP32 DevKit V1 | Dual-core, 240 MHz, 3.3V GPIO | Main microcontroller |
 | 16x2 LCD Display (I2C) | PCF8574 backpack, address 0x27 | Displays times and winner |
-| Stimulus LED | 5mm Red, Vf ≈ 2.0V | Visual GO signal for both players |
-| Push Button × 2 | SPST Tactile momentary | Player 1 and Player 2 inputs |
-| Resistor (220Ω) | 1/4W carbon film | LED current limiting |
+| Stimulus LED | 5mm Red, Vf 2.0V | Visual GO signal for both players |
+| Push Button x2 | SPST Tactile momentary | Player 1 and Player 2 inputs |
+| Resistor (220 ohm) | 1/4W carbon film | LED current limiting |
 | Passive Buzzer | 5V, direct GPIO drive | Audio event feedback |
 | Breadboard | 830-point solderless | Circuit assembly |
 | Jumper Wires | Male-to-male, assorted | Component connections |
 
 ---
 
-## 🔌 Pin Connection Table
+## Pin Connection Table
 
 | ESP32 GPIO | Connected To | Direction | Function |
-|---|---|---|---|
-| GPIO 15 | Stimulus LED (via 220Ω) | OUTPUT | Visual stimulus signal |
+|:---:|---|:---:|---|
+| GPIO 15 | Stimulus LED (via 220 ohm) | OUTPUT | Visual stimulus signal |
 | GPIO 4 | Player 1 Button | INPUT | P1 reaction press detection |
 | GPIO 5 | Player 2 Button | INPUT | P2 reaction press detection |
 | GPIO 18 | Buzzer (+) | OUTPUT | Audio feedback output |
-| GPIO 21 (SDA) | LCD SDA | I2C Data | Display data line |
-| GPIO 22 (SCL) | LCD SCL | I2C Clock | Display clock line |
+| GPIO 21 | LCD SDA | I2C Data | Display data line |
+| GPIO 22 | LCD SCL | I2C Clock | Display clock line |
 | 3V3 | LCD VCC | POWER | LCD supply voltage |
 | GND | LCD GND, Buttons, LED, Buzzer | GROUND | Common ground reference |
 
 ---
 
-## 🔁 System State Machine
+## System State Machine
 
-The firmware operates as a **5-state Finite State Machine (FSM)**:
+The firmware operates as a 5-state Finite State Machine. The system is always in exactly one state at any time, and specific events trigger transitions between states.
 
 ```
-                    ┌─────────────┐
-         Power ON → │  STATE_IDLE  │ ← Any button held to start
-                    └──────┬──────┘
-                           │
-                    ┌──────▼──────┐
-                    │STATE_WAITING│ ← Random 2–5 second delay
-                    └──────┬──────┘
-                    │             │
-            Button pressed    Delay elapsed
-            too early              │
-                    │      ┌───────▼────────┐
-                    │      │STATE_STIMULUS  │ ← LED ON + 3 beeps
-                    │      └───────┬────────┘
-                    │              │ Button(s) pressed
-                    │      ┌───────▼────────┐
-                    │      │ STATE_RESULT   │ ← Times shown + winner
-                    │      └───────┬────────┘
-                    │              │ Next round
-                    ▼              │
-             ┌──────────┐         │
-             │STATE_FAULT│         │
-             └──────┬───┘         │
-                    │             │
-                    └─────────────┘
-                    Both return to STATE_WAITING
+                         Power ON
+                            │
+                    ┌───────▼────────┐
+                    │   STATE_IDLE   │  Waiting for any button press
+                    └───────┬────────┘
+                            │  Button pressed
+                    ┌───────▼────────┐
+                    │ STATE_WAITING  │  Random 2–5 second delay
+                    └───────┬────────┘
+                   │                │
+         Button pressed          Delay elapsed
+         too early                  │
+                   │       ┌────────▼───────┐
+                   │       │STATE_STIMULUS  │  LED ON + 3 buzzer beeps
+                   │       └────────┬───────┘
+                   │                │  Button(s) pressed or timeout
+                   │       ┌────────▼───────┐
+                   │       │ STATE_RESULT   │  Times computed, winner declared
+                   │       └────────┬───────┘
+                   │                │  Auto-advance to next round
+                   ▼                │
+          ┌────────────────┐        │
+          │  STATE_FAULT   │        │
+          └────────┬───────┘        │
+                   │                │
+                   └────────────────┘
+                   Both return to STATE_WAITING
 ```
 
 ---
 
-## 🔊 Buzzer Feedback Reference
+## Buzzer Feedback Reference
 
 | Event | Pattern | Duration |
-|---|---|---|
-| System startup | 1 single beep | 150ms |
-| Round starting | 2 quick beeps | 60ms each |
-| LED stimulus activates | 3 sharp beeps — GO! | 100ms each, 80ms gap |
-| Valid win | 1 long beep | 600ms |
-| Draw result | 4 rapid beeps | 80ms each, 60ms gap |
+|---|---|:---:|
+| System startup | 1 single confirmation beep | 150ms |
+| Round starting | 2 quick soft beeps | 60ms each |
+| LED stimulus activates | 3 sharp beeps — GO signal | 100ms each, 80ms gap |
+| Valid win | 1 long celebratory beep | 600ms |
+| Draw result | 4 rapid alternating beeps | 80ms each, 60ms gap |
 | False start detected | 1 long alarm tone | 1200ms |
-| Round restarting | 2 soft beeps | 60ms each |
+| Round restarting | 2 soft transition beeps | 60ms each |
 
 ---
 
-## 💻 Software & Libraries
+## Software and Libraries
 
 | Tool / Library | Version | Purpose |
-|---|---|---|
+|---|:---:|---|
 | Arduino Framework | Latest | Firmware development language |
 | Wokwi Simulator | Online | Circuit simulation platform |
 | LiquidCrystal_I2C | 1.1.2 | I2C LCD display control |
 | Wire.h | Built-in | I2C two-wire communication |
-| millis() | Built-in | Millisecond timer for reaction time |
-| attachInterrupt() | Built-in | GPIO interrupt for button detection |
+| millis() | Built-in | Millisecond timer for reaction time measurement |
+| attachInterrupt() | Built-in | GPIO interrupt for instantaneous button detection |
 
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 coe_group07/
 │
-├── README.md                          ← You are here
+├── README.md
 │
 ├── code/
-│   └── reaction_time_game.ino         ← Complete ESP32 Arduino firmware
+│   └── reaction_time_game.ino
 │
 ├── simulation/
-│   ├── wokwi_link.txt                 ← Direct link to live Wokwi simulation
-│   └── circuit_screenshot.png         ← Screenshot of the complete wired circuit
+│   ├── wokwi_link.txt
+│   └── circuit_screenshot.png
 │
 ├── report/
-│   └── Group7_Reaction_Time_Report.pdf ← Full academic project report
+│   └── Group7_Reaction_Time_Report.pdf
 │
 └── presentation/
-    ├── Slides.pdf                      ← Presentation slide deck
-    └── Coe_group7_presentation.mp4     ← Video presentation (max 15 minutes)
+    ├── Slides.pdf
+    └── Coe_group7_presentation.mp4
 ```
 
 ---
 
-## 🚀 How to Run the Simulation
+## How to Run the Simulation
 
 **Option A — Wokwi Online (Recommended)**
 
 1. Open the link inside `simulation/wokwi_link.txt`
-2. The complete circuit opens directly in your browser
-3. Click the green **Play ▶** button to start the simulation
-4. The LCD will display: `GROUP 7 GAME — Press Any Btn`
+2. The complete circuit opens directly in your browser — no installation needed
+3. Click the green **Play** button to start the simulation
+4. The LCD will display `GROUP 7 GAME — Press Any Btn`
 5. Click either button on screen to begin a round
 6. Wait for the LED to turn ON and the buzzer to sound three beeps
-7. Click both buttons quickly to simulate Player 1 and Player 2 reacting
-8. Read the reaction times and winner on the LCD display
+7. Click both buttons in quick succession to simulate both players reacting
+8. Read the reaction times and winner declaration on the LCD display
 
 **Option B — Arduino IDE (Physical Hardware)**
 
 1. Install [Arduino IDE](https://www.arduino.cc/en/software)
-2. Install the **ESP32 board package** via Boards Manager
-3. Install the **LiquidCrystal_I2C** library via Library Manager
+2. Install the ESP32 board package via Boards Manager
+3. Install the `LiquidCrystal_I2C` library via Library Manager
 4. Open `code/reaction_time_game.ino`
-5. Connect your ESP32 via USB
-6. Select the correct board: `ESP32 Dev Module`
+5. Connect your ESP32 board via USB-C
+6. Select board: `ESP32 Dev Module`
 7. Select the correct COM port
-8. Click **Upload**
-9. Wire the circuit as shown in the pin table above
+8. Click Upload
+9. Wire the circuit according to the pin table above
 
 ---
 
-## 📊 How the Reaction Time is Measured
+## How Reaction Time is Measured
 
 ```
 Timeline:
-──────────────────────────────────────────────────────────►
-         │                    │              │
-    LED turns ON          P1 presses     P2 presses
-    T_start = millis()    p1Time=millis() p2Time=millis()
+─────────────────────────────────────────────────────────►
+        │                    │                │
+   LED turns ON          P1 presses       P2 presses
+   T_start = millis()    p1Time=millis()  p2Time=millis()
 
 Calculation:
-    P1 Reaction Time = p1Time - T_start  (milliseconds)
-    P2 Reaction Time = p2Time - T_start  (milliseconds)
-    Winner           = player with smaller reaction time
+   P1 Reaction Time = p1Time  −  T_start   (milliseconds)
+   P2 Reaction Time = p2Time  −  T_start   (milliseconds)
+   Winner           = player with the smaller reaction time
 ```
 
 ---
 
-## 🧪 Test Scenarios Covered
+## Test Scenarios
 
 | Scenario | Expected Behaviour |
 |---|---|
-| Normal round — P1 faster | P1 time shown, P2 time shown, P1 declared winner, win beep |
-| Normal round — P2 faster | P2 declared winner, win beep |
-| Both press simultaneously | Draw declared, 4 rapid beeps |
-| P1 presses before LED | FALSE START — PLAYER 1 displayed, alarm beep |
-| P2 presses before LED | FALSE START — PLAYER 2 displayed, alarm beep |
-| Neither player presses | Round voided after 5-second timeout |
+| Normal round — P1 faster | Both times shown, P1 declared winner, win beep plays |
+| Normal round — P2 faster | Both times shown, P2 declared winner, win beep plays |
+| Both press simultaneously | Draw declared, 4 rapid beeps play |
+| P1 presses before LED activates | FALSE START PLAYER 1 shown, alarm beep plays |
+| P2 presses before LED activates | FALSE START PLAYER 2 shown, alarm beep plays |
+| Neither player presses | Round voided after 5-second timeout, silent |
 | Only P1 presses | P1 wins by default, P2 shows No Response |
 | Only P2 presses | P2 wins by default, P1 shows No Response |
 
 ---
 
-## ⚠️ Important Notes
+## Important Technical Notes
 
-- All buttons use **active-low** logic — a press reads as `LOW` on the input pin
-- Internal **pull-up resistors** are enabled in firmware — no external pull-up components needed
-- The **volatile** keyword is applied to all variables shared between ISR and main loop
-- Both ISR functions use the **IRAM_ATTR** attribute for lowest-latency interrupt execution
-- The random delay uses `random(2000, 5001)` — never the same delay twice
+> All buttons use **active-low** logic. A press reads as `LOW` because the button connects the pin to GND.
+
+> Internal **pull-up resistors** are enabled via `INPUT_PULLUP` in firmware. No external pull-up components are needed.
+
+> The **`volatile`** keyword is applied to all variables shared between ISR context and the main loop. This prevents the compiler from caching stale values in CPU registers.
+
+> Both ISR functions carry the **`IRAM_ATTR`** attribute. This places interrupt code in the ESP32's fast internal SRAM, eliminating flash cache miss latency on ISR entry.
+
+> The random delay uses `random(2000, 5001)` seeded from the ESP32's hardware RNG. The stimulus interval is never predictable.
 
 ---
 
-## 📁 Submission Checklist
+## Submission Checklist
 
 - [x] Source code uploaded to `code/` folder
 - [ ] Wokwi simulation link added to `simulation/wokwi_link.txt`
-- [ ] Circuit screenshot saved to `simulation/general_setup.png`
+- [ ] Circuit screenshot saved to `simulation/circuit_screenshot.png`
 - [x] Academic report uploaded to `report/` folder
 - [ ] Presentation slides uploaded to `presentation/` folder
 - [ ] Video presentation uploaded to `presentation/` folder
 - [ ] Video named correctly: `Coe_group7_presentation.mp4`
-- [ ] Video submitted to course submission link
+- [ ] Video submitted to the COE course submission link
 - [ ] All group members' names and index numbers verified
 
 ---
 
-## 📚 References
+## References
 
 1. Espressif Systems. (2023). *ESP32 Technical Reference Manual*. Espressif Systems.
 2. Arduino. (2024). *Arduino Language Reference*. Arduino LLC. https://www.arduino.cc/reference/en/
@@ -260,9 +274,19 @@ Calculation:
 
 <div align="center">
 
-**Group 7 | COE 381 — Microprocessors | KNUST**
-**Department of Computer Engineering**
-**Supervisor: Dr. Eliel Keelson**
-**© 2026 — All work is original. Plagiarism policy strictly observed.**
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0D1B2A&height=120&section=footer&text=Group%207%20%7C%20COE%20381%20%7C%20KNUST&fontSize=18&fontColor=F4A900&animation=fadeIn&fontAlignY=65)
+
+</div>
+
+<div align="center">
+
+**Department of Computer Engineering &nbsp;|&nbsp; Kwame Nkrumah University of Science and Technology**
+
+**Supervisor: Dr. Eliel Keelson &nbsp;|&nbsp; Submission: March 29, 2026**
+
+![Made with](https://img.shields.io/badge/Made%20with-Arduino%20C%2B%2B-00979D?style=flat-square&logo=arduino&logoColor=white)
+![Simulated on](https://img.shields.io/badge/Simulated%20on-Wokwi-2DC653?style=flat-square)
+![Institution](https://img.shields.io/badge/KNUST-Computer%20Engineering-1B3A5C?style=flat-square)
+![Original Work](https://img.shields.io/badge/Work-100%25%20Original-F4A900?style=flat-square)
 
 </div>
