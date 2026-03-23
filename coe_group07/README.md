@@ -63,11 +63,11 @@ A randomised stimulus LED activates after a variable delay of 2 to 5 seconds. Bo
 | Component | Specification | Role |
 |---|---|---|
 | ESP32 DevKit V1 | Dual-core, 240 MHz, 3.3V GPIO | Main microcontroller |
-| 16x2 LCD Display (I2C) | PCF8574 backpack, address 0x27 | Displays times and winner |
+| 240x240 LCD Display (ST7789) |Uses SPI interface | Displays times and winner |
 | Stimulus LED | 5mm Red, Vf 2.0V | Visual GO signal for both players |
 | Push Button x2 | SPST Tactile momentary | Player 1 and Player 2 inputs |
 | Resistor (220 ohm) | 1/4W carbon film | LED current limiting |
-| Passive Buzzer | 5V, direct GPIO drive | Audio event feedback |
+| Passive Buzzer | 3.3V, direct GPIO drive | Audio event feedback |
 | Breadboard | 830-point solderless | Circuit assembly |
 | Jumper Wires | Male-to-male, assorted | Component connections |
 
