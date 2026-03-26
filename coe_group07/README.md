@@ -208,8 +208,8 @@ coe_group07/
 │   └── Group7_Reaction_Time_Report.pdf
 │
 └── presentation/
-    ├── Slides.pdf
-    └── Coe_group7_presentation.mp4
+    ├── Group7_Presentation.pptx
+    └── Coe_group7_presentation.txt (link to video)
 ```
 ---
 
