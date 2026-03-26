@@ -202,7 +202,7 @@ coe_group07/
 │
 ├── simulation/
 │   ├── wokwi_link.txt
-│   └── circuit_screenshot.png
+│   └── general_setup.png
 │
 ├── report/
 │   └── Group7_Reaction_Time_Report.pdf
