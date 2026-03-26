@@ -164,8 +164,7 @@ coe_group07/
 │
 ├── code/
 │   │
-│   ├── simulation/                        ← Wokwi Arduino simulation
-│   │   └── reaction_time_game.ino
+│   ├── reaction_time_game.ino                       ← Wokwi Arduino simulation
 │   │
 │   └── hardware/                          ← ESP-IDF hardware implementation
 │       │
