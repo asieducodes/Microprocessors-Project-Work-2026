@@ -148,18 +148,57 @@ The firmware operates as a 5-state Finite State Machine. The system is always in
 | Wire.h | Built-in | I2C two-wire communication |
 | millis() | Built-in | Millisecond timer for reaction time measurement |
 | attachInterrupt() | Built-in | GPIO interrupt for instantaneous button detection |
+| ESP-IDF Framework | v5.x | Hardware firmware development |
+| CMake | Built-in | ESP-IDF project build system |
 
 ---
 
 ## Repository Structure
 
+The repository contains two implementations — a Wokwi simulation
+version and a full hardware implementation using ESP-IDF.
 ```
 coe_group07/
 │
 ├── README.md
 │
 ├── code/
-│   └── reaction_time_game.ino
+│   │
+│   ├── simulation/                        ← Wokwi Arduino simulation
+│   │   └── reaction_time_game.ino
+│   │
+│   └── hardware/                          ← ESP-IDF hardware implementation
+│       │
+│       ├── .devcontainer/
+│       │   ├── devcontainer.json
+│       │   └── Dockerfile
+│       │
+│       ├── assets/
+│       │   └── images/
+│       │       └── waveforms/
+│       │           ├── initialization_sequence.png
+│       │           ├── moment_before_trigger_1.png
+│       │           ├── moment_before_trigger_2.png
+│       │           ├── trigger_2.png
+│       │           └── trigger.png
+│       │
+│       ├── components/
+│       │   ├── buzzer_module/
+│       │   ├── font_module/
+│       │   ├── fsm_states_handler/
+│       │   ├── gpio_module/
+│       │   ├── graphics_module/
+│       │   ├── st7789/
+│       │   └── timer_module/
+│       │
+│       ├── main/
+│       │   ├── CMakeLists.txt
+│       │   ├── main.c
+│       │   └── README.md
+│       │
+│       ├── .clangd
+│       ├── .gitignore
+│       └── CMakeLists.txt
 │
 ├── simulation/
 │   ├── wokwi_link.txt
@@ -172,7 +211,6 @@ coe_group07/
     ├── Slides.pdf
     └── Coe_group7_presentation.mp4
 ```
-
 ---
 
 ## How to Run the Simulation
@@ -201,6 +239,41 @@ coe_group07/
 9. Wire the circuit according to the pin table above
 
 ---
+## Hardware Implementation (ESP-IDF)
+
+The hardware version is a complete ESP-IDF C implementation targeting
+the ESP32-S3 with a ST7789 SPI TFT display. It is structured as a
+modular ESP-IDF component project.
+
+**Key differences from the simulation version:**
+
+| | Simulation | Hardware |
+|---|---|---|
+| Framework | Arduino C++ | ESP-IDF (C) |
+| Display | 16x2 I2C LCD | ST7789 SPI TFT |
+| Build system | Arduino IDE | CMake |
+| Entry point | .ino file | main.c |
+| Architecture | Single file | Modular components |
+
+**Component breakdown:**
+
+| Component | Purpose |
+|---|---|
+| `buzzer_module` | Buzzer tone generation and event patterns |
+| `font_module` | Font rendering for TFT display output |
+| `fsm_states_handler` | Finite State Machine logic and state transitions |
+| `gpio_module` | GPIO configuration, interrupts, and button handling |
+| `graphics_module` | TFT graphics rendering and UI layout |
+| `st7789` | Low-level SPI driver for the ST7789 display controller |
+| `timer_module` | Hardware timer configuration and microsecond precision timing |
+
+**To build and flash the hardware version:**
+
+1. Install ESP-IDF v5.x — https://docs.espressif.com/projects/esp-idf
+2. Open the `code/hardware/` folder in VS Code with the ESP-IDF extension
+3. Run `idf.py build` to compile
+4. Run `idf.py flash` to upload to the ESP32-S3
+5. Run `idf.py monitor` to view serial output
 
 ## How Reaction Time is Measured
 
@@ -247,21 +320,6 @@ Calculation:
 > The random delay uses `random(2000, 5001)` seeded from the ESP32's hardware RNG. The stimulus interval is never predictable.
 
 ---
-
-## Submission Checklist
-
-- [x] Source code uploaded to `code/` folder
-- [ ] Wokwi simulation link added to `simulation/wokwi_link.txt`
-- [ ] Circuit screenshot saved to `simulation/circuit_screenshot.png`
-- [x] Academic report uploaded to `report/` folder
-- [ ] Presentation slides uploaded to `presentation/` folder
-- [ ] Video presentation uploaded to `presentation/` folder
-- [ ] Video named correctly: `Coe_group7_presentation.mp4`
-- [ ] Video submitted to the COE course submission link
-- [ ] All group members' names and index numbers verified
-
----
-
 ## References
 
 1. Espressif Systems. (2023). *ESP32 Technical Reference Manual*. Espressif Systems.
