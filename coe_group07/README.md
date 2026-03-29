@@ -208,7 +208,7 @@ coe_group07/
 │
 └── presentation/
     ├── Group7_Presentation.pptx
-    └── Coe_group7_presentation.txt (link to video)
+    └── Coe_group7_presentation.mp4 (video in MEGA folder)
 ```
 ---
 
